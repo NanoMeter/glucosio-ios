@@ -916,7 +916,7 @@
 				TargetAttributes = {
 					551193631BC2D2B9007CD147 = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = 5QFGKN2X54;
+						DevelopmentTeam = G8M9P5X24R;
 					};
 					5511937C1BC2D2B9007CD147 = {
 						CreatedOnToolsVersion = 7.0;
@@ -1785,9 +1785,10 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = G8M9P5X24R;
 				INFOPLIST_FILE = glucosio/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.glucosio.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nanometer.glucosio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1801,9 +1802,10 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = G8M9P5X24R;
 				INFOPLIST_FILE = glucosio/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.glucosio.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nanometer.glucosio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
