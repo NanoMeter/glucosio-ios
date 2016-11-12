@@ -18,106 +18,109 @@
 #pragma mark - Inits
 
 - (instancetype)initWithModeController:(GLUCPersistenceController *)persistence {
-    
-    self  = [super init];
-    if (self != nil) {
-        _modelController = persistence;
-    }
-    
-    return self;
+  
+  self  = [super init];
+  if (self != nil) {
+    _modelController = persistence;
+  }
+  
+  return self;
 }
 
 - (NSArray<GLUCGraphPoint *> *)graphPointsForReadingType:(Class)readingType {
+  
+  NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
+  
+  if ([readingType isSubclassOfClass:[GLUCReading class]]) {
     
-    NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
+    RLMResults<GLUCReading *> *readings = [self.modelController allReadingsOfType:readingType sortByDateAscending:YES];
     
-    if ([readingType isSubclassOfClass:[GLUCReading class]]) {
-        
-        RLMResults<GLUCReading *> *readings = [self.modelController allReadingsOfType:readingType sortByDateAscending:YES];
-        
-        for (GLUCReading *reading in readings) {
-            GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
-            
-            point.x = reading.creationDate;
-            
-            NSNumber *readingInPreferredUnits = [reading readingInUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];
-
-            point.y = readingInPreferredUnits.doubleValue;
-            
-            [points addObject:point];
-        }
+    for (GLUCReading *reading in readings) {
+      GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
+      
+      point.x = reading.creationDate;
+      
+      NSNumber *readingInPreferredUnits = [reading readingInUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];
+      
+      point.y = readingInPreferredUnits.doubleValue;
+      
+      [points addObject:point];
     }
-    
-    return [points copy];
+  }
+  
+  return [points copy];
 }
 
 - (NSArray<GLUCGraphPoint *> *)weeklyAverageGraphPointsForReadingType:(Class)readingType {
-    
-    NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
-    
-    // Use same date technique for averaging as Glucosio for Android
-    
-    NSDate *maxDate = [self.modelController lastReadingOfType:readingType].creationDate;
-    NSDate *minDate = [self.modelController firstReadingOfType:readingType].creationDate;
-    
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSInteger weeksBetween = [cal gluc_weeksBetween:minDate andDate:maxDate] + 1;
-    
+  
+  NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
+  
+  // Use same date technique for averaging as Glucosio for Android
+  
+  NSDate *maxDate = [self.modelController lastReadingOfType:readingType].creationDate;
+  NSDate *minDate = [self.modelController firstReadingOfType:readingType].creationDate;
+  
+  NSCalendar *cal = [NSCalendar currentCalendar];
+  NSInteger weeksBetween = [cal gluc_weeksBetween:minDate andDate:maxDate] + 1;
+  
+  if (maxDate && minDate){
     for (NSInteger weekIndex = 0; weekIndex < weeksBetween; ++weekIndex) {
-        NSDate *startDate = [cal gluc_dateByAddingWeeks:weekIndex toDate:minDate];
-        NSDate *endDate = [cal gluc_dateByAddingWeeks:1 toDate:startDate];
-        
-        RLMResults<GLUCReading *> *readings = [self.modelController readingsOfType:readingType fromDate:startDate toDate:endDate sortByDateAscending:YES];
-        
-        GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
-        
-        NSNumber *averageValue = [readings averageOfProperty:@"reading"];
-        
-        NSNumber *averageInDisplayUnits = [readingType convertValue:averageValue fromUnits:0 toUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];
-        
-        
-        point.y = averageInDisplayUnits.doubleValue;
-        
-        point.x = startDate;
-        
-        [points addObject:point];
+      NSDate *startDate = [cal gluc_dateByAddingWeeks:weekIndex toDate:minDate];
+      NSDate *endDate = [cal gluc_dateByAddingWeeks:1 toDate:startDate];
+      
+      RLMResults<GLUCReading *> *readings = [self.modelController readingsOfType:readingType fromDate:startDate toDate:endDate sortByDateAscending:YES];
+      
+      GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
+      
+      NSNumber *averageValue = [readings averageOfProperty:@"reading"];
+      
+      NSNumber *averageInDisplayUnits = [readingType convertValue:averageValue fromUnits:0 toUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];
+      
+      
+      point.y = averageInDisplayUnits.doubleValue;
+      
+      point.x = startDate;
+      
+      [points addObject:point];
     }
-    
-    return [points copy];
+  }
+  return [points copy];
 }
 
 - (NSArray<GLUCGraphPoint *> *)montlyAverageGraphPointsForReadingType:(Class)readingType {
-
-    NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
-    
-    // Use same date technique for averaging as Glucosio for Android
-    
-    NSDate *maxDate = [self.modelController lastReadingOfType:readingType].creationDate;
-    NSDate *minDate = [self.modelController firstReadingOfType:readingType].creationDate;
-    
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSInteger monthsBetween = [cal gluc_monthsBetween:minDate andDate:maxDate] + 1;
+  
+  NSMutableArray<GLUCGraphPoint *> *points = [NSMutableArray array];
+  
+  // Use same date technique for averaging as Glucosio for Android
+  
+  NSDate *maxDate = [self.modelController lastReadingOfType:readingType].creationDate;
+  NSDate *minDate = [self.modelController firstReadingOfType:readingType].creationDate;
+  
+  NSCalendar *cal = [NSCalendar currentCalendar];
+  NSInteger monthsBetween = [cal gluc_monthsBetween:minDate andDate:maxDate] + 1;
+  
+  if (maxDate && minDate){
     
     for (NSInteger monthIndex = 0; monthIndex < monthsBetween; ++monthIndex) {
-        NSDate *startDate = [cal gluc_dateByAddingMonths:monthIndex toDate:minDate];
-        NSDate *endDate = [cal gluc_dateByAddingMonths:1 toDate:startDate];
-        
-        RLMResults<GLUCReading *> *readings = [self.modelController readingsOfType:readingType fromDate:startDate toDate:endDate sortByDateAscending:YES];
-        
-        GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
-        
-        NSNumber *averageValue = [readings averageOfProperty:@"reading"];
-        
-        NSNumber *averageInDisplayUnits = [readingType convertValue:averageValue fromUnits:0 toUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];        
-        
-        point.y = averageInDisplayUnits.doubleValue;
-        
-        point.x = startDate;
-        
-        [points addObject:point];
+      NSDate *startDate = [cal gluc_dateByAddingMonths:monthIndex toDate:minDate];
+      NSDate *endDate = [cal gluc_dateByAddingMonths:1 toDate:startDate];
+      
+      RLMResults<GLUCReading *> *readings = [self.modelController readingsOfType:readingType fromDate:startDate toDate:endDate sortByDateAscending:YES];
+      
+      GLUCGraphPoint *point = [[GLUCGraphPoint alloc] init];
+      
+      NSNumber *averageValue = [readings averageOfProperty:@"reading"];
+      
+      NSNumber *averageInDisplayUnits = [readingType convertValue:averageValue fromUnits:0 toUnits:[self.modelController.currentUser unitPreferenceForReadingType:readingType]];
+      
+      point.y = averageInDisplayUnits.doubleValue;
+      
+      point.x = startDate;
+      
+      [points addObject:point];
     }
-    
-    return [points copy];
+  }
+  return [points copy];
 }
 
 
